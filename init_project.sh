@@ -125,7 +125,7 @@ bash "${devbox_dir}/scripts/host/configure_etc_hosts.sh"
 
 status "Configuring kubernetes cluster on the minikube"
 # TODO: Optimize. Helm tiller must be initialized and started before environment configuration can begin
-helm init --wait
+helm init --wait --output yaml | sed 's@apiVersion: extensions/v1beta1@apiVersion: apps/v1@' | sed 's@  replicas: 1@  replicas: 1\n  selector: {"matchLabels": {"app": "helm", "name": "tiller"}}@' | kubectl apply -f -
 #waitForKubernetesPodToRun 'tiller-deploy'
 
 # TODO: Do not clean up environment when '-f' flag was not specified
